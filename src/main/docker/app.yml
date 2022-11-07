@@ -1,5 +1,5 @@
 # This configuration is intended for development purpose, it's **your** responsibility to harden it for production
-version: '3.8'
+version: '3.3'
 services:
   erpchurch-app:
     image: erpchurch
@@ -12,10 +12,14 @@ services:
       - SPRING_R2DBC_URL=r2dbc:postgresql://erpchurch-postgresql:5432/erpChurch
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://erpchurch-postgresql:5432/erpChurch
       - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
+      - ERP_CHURCH_PROD_DB=${ERP_CHURCH_PROD_DB}
+      - PG_DATABASE_PROD_USER=${PG_DATABASE_PROD_USER}
+      - PG_DATABASE_PROD_PASSWORD=${PG_DATABASE_PROD_PASSWORD}
+      - ERP_CHURCH_PROD_PORT=${ERP_CHURCH_PROD_PORT}
     # If you want to expose these ports outside your dev PC,
     # remove the "127.0.0.1:" prefix
     ports:
-      - 127.0.0.1:8080:8080
+      - 127.0.0.1:8180:8180
   erpchurch-postgresql:
     image: postgres:14.5
     # volumes:

@@ -36,7 +36,7 @@
     "prodDatabaseType": "postgresql",
     "reactive": true,
     "searchEngine": false,
-    "serverPort": "8080",
+    "serverPort": "8180",
     "serverSideOptions": [],
     "serviceDiscoveryType": "eureka",
     "skipCheckLengthOfIdentifier": false,

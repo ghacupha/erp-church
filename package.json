@@ -84,7 +84,7 @@
     "webpack-dev-server": "webpack serve"
   },
   "config": {
-    "backend_port": "8080",
+    "backend_port": "8180",
     "default_environment": "prod",
     "packaging": "jar"
   },

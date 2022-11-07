@@ -49,7 +49,7 @@ spring:
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
-    url: jdbc:postgresql://localhost:5432/erpChurch
+    url: ${LOCAL_PG_SERVER}/${ERP_CHURCH_DEV_DB}
   mail:
     host: localhost
     port: 25
@@ -58,9 +58,9 @@ spring:
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/erpChurch
-    username: erpChurch
-    password:
+    url: ${LOCAL_R2DBC_URL}/${ERP_CHURCH_DEV_DB}
+    username: ${PG_DATABASE_DEV_USER}
+    password: ${PG_DATABASE_DEV_PASSWORD}
   thymeleaf:
     cache: false
   sleuth:
@@ -79,7 +79,7 @@ spring:
         enabled: true
 
 server:
-  port: 8080
+  port: ${ERP_CHURCH_DEV_PORT}
 
 # ===================================================================
 # JHipster specific properties
@@ -110,7 +110,7 @@ jhipster:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: http://127.0.0.1:8080
+    base-url: 'http://127.0.0.1:${application.port}'
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
