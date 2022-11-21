@@ -55,6 +55,11 @@ module.exports = async options =>
           secure: false,
           changeOrigin: options.tls,
         },
+        {
+          context: ['/websocket'],
+          target: 'ws://127.0.0.1:8180',
+          ws: true,
+        },
       ],
       https: options.tls,
       historyApiFallback: true,

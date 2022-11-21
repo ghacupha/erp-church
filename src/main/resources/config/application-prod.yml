@@ -50,6 +50,9 @@ spring:
       profile: prod
       label: main # toggle to switch to a different version of the configuration as stored in git
       # it can be set to any label, branch or commit of the configuration source Git repository
+  data:
+  elasticsearch:
+    uris: ${SPRING_DATA_JEST_URI}
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: prod

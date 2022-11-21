@@ -1,12 +1,14 @@
 package io.github.erp.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 import io.github.erp.IntegrationTest;
 import io.github.erp.config.Constants;
 import io.github.erp.domain.User;
 import io.github.erp.repository.EntityManager;
 import io.github.erp.repository.UserRepository;
+import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.security.AuthoritiesConstants;
 import io.github.erp.service.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for the {@link UserResource} REST controller.
@@ -29,6 +32,14 @@ class PublicUserResourceIT {
 
     @Autowired
     private UserRepository userRepository;
+
+    /**
+     * This repository is mocked in the io.github.erp.repository.search test package.
+     *
+     * @see io.github.erp.repository.search.UserSearchRepositoryMockConfiguration
+     */
+    @Autowired
+    private UserSearchRepository mockUserSearchRepository;
 
     @Autowired
     private EntityManager em;

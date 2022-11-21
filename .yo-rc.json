@@ -37,7 +37,7 @@
     "pages": [],
     "prodDatabaseType": "postgresql",
     "reactive": true,
-    "searchEngine": false,
+    "searchEngine": "elasticsearch",
     "serverPort": "8180",
     "serverSideOptions": [],
     "serviceDiscoveryType": "eureka",
@@ -46,7 +46,7 @@
     "skipFakeData": false,
     "skipUserManagement": false,
     "testFrameworks": ["cypress", "protractor", "gatling", "cucumber"],
-    "websocket": false,
+    "websocket": "spring-websocket",
     "withAdminUi": true
   }
 }

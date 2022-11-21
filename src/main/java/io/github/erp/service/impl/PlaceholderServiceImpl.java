@@ -1,7 +1,10 @@
 package io.github.erp.service.impl;
 
+import static org.elasticsearch.index.query.QueryBuilders.*;
+
 import io.github.erp.domain.Placeholder;
 import io.github.erp.repository.PlaceholderRepository;
+import io.github.erp.repository.search.PlaceholderSearchRepository;
 import io.github.erp.service.PlaceholderService;
 import io.github.erp.service.dto.PlaceholderDTO;
 import io.github.erp.service.mapper.PlaceholderMapper;
@@ -26,21 +29,34 @@ public class PlaceholderServiceImpl implements PlaceholderService {
 
     private final PlaceholderMapper placeholderMapper;
 
-    public PlaceholderServiceImpl(PlaceholderRepository placeholderRepository, PlaceholderMapper placeholderMapper) {
+    private final PlaceholderSearchRepository placeholderSearchRepository;
+
+    public PlaceholderServiceImpl(
+        PlaceholderRepository placeholderRepository,
+        PlaceholderMapper placeholderMapper,
+        PlaceholderSearchRepository placeholderSearchRepository
+    ) {
         this.placeholderRepository = placeholderRepository;
         this.placeholderMapper = placeholderMapper;
+        this.placeholderSearchRepository = placeholderSearchRepository;
     }
 
     @Override
     public Mono<PlaceholderDTO> save(PlaceholderDTO placeholderDTO) {
         log.debug("Request to save Placeholder : {}", placeholderDTO);
-        return placeholderRepository.save(placeholderMapper.toEntity(placeholderDTO)).map(placeholderMapper::toDto);
+        return placeholderRepository
+            .save(placeholderMapper.toEntity(placeholderDTO))
+            .flatMap(placeholderSearchRepository::save)
+            .map(placeholderMapper::toDto);
     }
 
     @Override
     public Mono<PlaceholderDTO> update(PlaceholderDTO placeholderDTO) {
         log.debug("Request to update Placeholder : {}", placeholderDTO);
-        return placeholderRepository.save(placeholderMapper.toEntity(placeholderDTO)).map(placeholderMapper::toDto);
+        return placeholderRepository
+            .save(placeholderMapper.toEntity(placeholderDTO))
+            .flatMap(placeholderSearchRepository::save)
+            .map(placeholderMapper::toDto);
     }
 
     @Override
@@ -55,6 +71,11 @@ public class PlaceholderServiceImpl implements PlaceholderService {
                 return existingPlaceholder;
             })
             .flatMap(placeholderRepository::save)
+            .flatMap(savedPlaceholder -> {
+                placeholderSearchRepository.save(savedPlaceholder);
+
+                return Mono.just(savedPlaceholder);
+            })
             .map(placeholderMapper::toDto);
     }
 
@@ -73,6 +94,10 @@ public class PlaceholderServiceImpl implements PlaceholderService {
         return placeholderRepository.count();
     }
 
+    public Mono<Long> searchCount() {
+        return placeholderSearchRepository.count();
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Mono<PlaceholderDTO> findOne(Long id) {
@@ -83,6 +108,13 @@ public class PlaceholderServiceImpl implements PlaceholderService {
     @Override
     public Mono<Void> delete(Long id) {
         log.debug("Request to delete Placeholder : {}", id);
-        return placeholderRepository.deleteById(id);
+        return placeholderRepository.deleteById(id).then(placeholderSearchRepository.deleteById(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Flux<PlaceholderDTO> search(String query, Pageable pageable) {
+        log.debug("Request to search for a page of Placeholders for query {}", query);
+        return placeholderSearchRepository.search(query, pageable).map(placeholderMapper::toDto);
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.elasticsearch.repository.config.EnableReactiveElasticsearchRepositories;
 import org.springframework.data.r2dbc.convert.MappingR2dbcConverter;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
 import org.springframework.data.r2dbc.core.ReactiveDataAccessStrategy;
@@ -34,6 +35,7 @@ import tech.jhipster.config.JHipsterConstants;
 @Configuration
 @EnableR2dbcRepositories({ "io.github.erp.repository" })
 @EnableTransactionManagement
+@EnableReactiveElasticsearchRepositories("io.github.erp.repository.search")
 public class DatabaseConfiguration {
 
     // LocalDateTime seems to be the only type that is supported across all drivers atm

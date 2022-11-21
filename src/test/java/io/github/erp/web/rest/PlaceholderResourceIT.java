@@ -1,6 +1,7 @@
 package io.github.erp.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -9,13 +10,17 @@ import io.github.erp.IntegrationTest;
 import io.github.erp.domain.Placeholder;
 import io.github.erp.repository.EntityManager;
 import io.github.erp.repository.PlaceholderRepository;
+import io.github.erp.repository.search.PlaceholderSearchRepository;
 import io.github.erp.service.PlaceholderService;
 import io.github.erp.service.dto.PlaceholderDTO;
 import io.github.erp.service.mapper.PlaceholderMapper;
 import java.time.Duration;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import org.apache.commons.collections4.IterableUtils;
+import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +55,7 @@ class PlaceholderResourceIT {
 
     private static final String ENTITY_API_URL = "/api/placeholders";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+    private static final String ENTITY_SEARCH_API_URL = "/api/_search/placeholders";
 
     private static Random random = new Random();
     private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
@@ -65,6 +71,9 @@ class PlaceholderResourceIT {
 
     @Mock
     private PlaceholderService placeholderServiceMock;
+
+    @Autowired
+    private PlaceholderSearchRepository placeholderSearchRepository;
 
     @Autowired
     private EntityManager em;
@@ -109,6 +118,12 @@ class PlaceholderResourceIT {
         deleteEntities(em);
     }
 
+    @AfterEach
+    public void cleanupElasticSearchRepository() {
+        placeholderSearchRepository.deleteAll().block();
+        assertThat(placeholderSearchRepository.count().block()).isEqualTo(0);
+    }
+
     @BeforeEach
     public void initTest() {
         deleteEntities(em);
@@ -118,6 +133,7 @@ class PlaceholderResourceIT {
     @Test
     void createPlaceholder() throws Exception {
         int databaseSizeBeforeCreate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         // Create the Placeholder
         PlaceholderDTO placeholderDTO = placeholderMapper.toDto(placeholder);
         webTestClient
@@ -132,6 +148,12 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeCreate + 1);
+        await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
+            });
         Placeholder testPlaceholder = placeholderList.get(placeholderList.size() - 1);
         assertThat(testPlaceholder.getPlaceholderIndex()).isEqualTo(DEFAULT_PLACEHOLDER_INDEX);
         assertThat(testPlaceholder.getPlaceholderValue()).isEqualTo(DEFAULT_PLACEHOLDER_VALUE);
@@ -144,6 +166,7 @@ class PlaceholderResourceIT {
         PlaceholderDTO placeholderDTO = placeholderMapper.toDto(placeholder);
 
         int databaseSizeBeforeCreate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
 
         // An entity with an existing ID cannot be created, so this API call must fail
         webTestClient
@@ -158,11 +181,14 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeCreate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     void checkPlaceholderIndexIsRequired() throws Exception {
         int databaseSizeBeforeTest = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         // set the field null
         placeholder.setPlaceholderIndex(null);
 
@@ -180,6 +206,8 @@ class PlaceholderResourceIT {
 
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeTest);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -265,6 +293,8 @@ class PlaceholderResourceIT {
         placeholderRepository.save(placeholder).block();
 
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        placeholderSearchRepository.save(placeholder).block();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
 
         // Update the placeholder
         Placeholder updatedPlaceholder = placeholderRepository.findById(placeholder.getId()).block();
@@ -286,11 +316,22 @@ class PlaceholderResourceIT {
         Placeholder testPlaceholder = placeholderList.get(placeholderList.size() - 1);
         assertThat(testPlaceholder.getPlaceholderIndex()).isEqualTo(UPDATED_PLACEHOLDER_INDEX);
         assertThat(testPlaceholder.getPlaceholderValue()).isEqualTo(UPDATED_PLACEHOLDER_VALUE);
+        await()
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+                assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
+                List<Placeholder> placeholderSearchList = IterableUtils.toList(placeholderSearchRepository.findAll().collectList().block());
+                Placeholder testPlaceholderSearch = placeholderSearchList.get(searchDatabaseSizeAfter - 1);
+                assertThat(testPlaceholderSearch.getPlaceholderIndex()).isEqualTo(UPDATED_PLACEHOLDER_INDEX);
+                assertThat(testPlaceholderSearch.getPlaceholderValue()).isEqualTo(UPDATED_PLACEHOLDER_VALUE);
+            });
     }
 
     @Test
     void putNonExistingPlaceholder() throws Exception {
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         placeholder.setId(count.incrementAndGet());
 
         // Create the Placeholder
@@ -309,11 +350,14 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeUpdate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     void putWithIdMismatchPlaceholder() throws Exception {
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         placeholder.setId(count.incrementAndGet());
 
         // Create the Placeholder
@@ -332,11 +376,14 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeUpdate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     void putWithMissingIdPathParamPlaceholder() throws Exception {
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         placeholder.setId(count.incrementAndGet());
 
         // Create the Placeholder
@@ -355,6 +402,8 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeUpdate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
@@ -420,6 +469,7 @@ class PlaceholderResourceIT {
     @Test
     void patchNonExistingPlaceholder() throws Exception {
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         placeholder.setId(count.incrementAndGet());
 
         // Create the Placeholder
@@ -438,11 +488,14 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeUpdate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     void patchWithIdMismatchPlaceholder() throws Exception {
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         placeholder.setId(count.incrementAndGet());
 
         // Create the Placeholder
@@ -461,11 +514,14 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeUpdate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     void patchWithMissingIdPathParamPlaceholder() throws Exception {
         int databaseSizeBeforeUpdate = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
         placeholder.setId(count.incrementAndGet());
 
         // Create the Placeholder
@@ -484,14 +540,20 @@ class PlaceholderResourceIT {
         // Validate the Placeholder in the database
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeUpdate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
 
     @Test
     void deletePlaceholder() {
         // Initialize the database
         placeholderRepository.save(placeholder).block();
+        placeholderRepository.save(placeholder).block();
+        placeholderSearchRepository.save(placeholder).block();
 
         int databaseSizeBeforeDelete = placeholderRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeBefore).isEqualTo(databaseSizeBeforeDelete);
 
         // Delete the placeholder
         webTestClient
@@ -505,5 +567,31 @@ class PlaceholderResourceIT {
         // Validate the database contains one less item
         List<Placeholder> placeholderList = placeholderRepository.findAll().collectList().block();
         assertThat(placeholderList).hasSize(databaseSizeBeforeDelete - 1);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(placeholderSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore - 1);
+    }
+
+    @Test
+    void searchPlaceholder() {
+        // Initialize the database
+        placeholder = placeholderRepository.save(placeholder).block();
+        placeholderSearchRepository.save(placeholder).block();
+
+        // Search the placeholder
+        webTestClient
+            .get()
+            .uri(ENTITY_SEARCH_API_URL + "?query=id:" + placeholder.getId())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.[*].id")
+            .value(hasItem(placeholder.getId().intValue()))
+            .jsonPath("$.[*].placeholderIndex")
+            .value(hasItem(DEFAULT_PLACEHOLDER_INDEX))
+            .jsonPath("$.[*].placeholderValue")
+            .value(hasItem(DEFAULT_PLACEHOLDER_VALUE));
     }
 }

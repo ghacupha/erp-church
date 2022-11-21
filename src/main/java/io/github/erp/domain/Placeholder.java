@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * A Placeholder.
  */
 @Table("placeholder")
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "placeholder")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Placeholder implements Serializable {
 

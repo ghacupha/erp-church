@@ -28,6 +28,11 @@ eureka:
     service-url:
       defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
 
+management:
+  health:
+    elasticsearch:
+      enabled: false
+
 spring:
   devtools:
     restart:
@@ -46,6 +51,9 @@ spring:
       profile: dev
       label: main # toggle to switch to a different version of the configuration as stored in git
       # it can be set to any label, branch or commit of the configuration source Git repository
+  data:
+  elasticsearch:
+    uris: ${SPRING_DATA_JEST_URI}
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker

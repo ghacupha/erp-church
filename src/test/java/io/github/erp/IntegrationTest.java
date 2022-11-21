@@ -2,6 +2,7 @@ package io.github.erp;
 
 import io.github.erp.ErpChurchApp;
 import io.github.erp.config.AsyncSyncConfiguration;
+import io.github.erp.config.EmbeddedElasticsearch;
 import io.github.erp.config.EmbeddedSQL;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(classes = { ErpChurchApp.class, AsyncSyncConfiguration.class })
+@EmbeddedElasticsearch
 @EmbeddedSQL
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public @interface IntegrationTest {

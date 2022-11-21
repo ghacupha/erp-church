@@ -233,4 +233,27 @@ public class PlaceholderResource {
                 )
             );
     }
+
+    /**
+     * {@code SEARCH  /_search/placeholders?query=:query} : search for the placeholder corresponding
+     * to the query.
+     *
+     * @param query the query of the placeholder search.
+     * @param pageable the pagination information.
+     * @param request a {@link ServerHttpRequest} request.
+     * @return the result of the search.
+     */
+    @GetMapping("/_search/placeholders")
+    public Mono<ResponseEntity<Flux<PlaceholderDTO>>> searchPlaceholders(
+        @RequestParam String query,
+        @org.springdoc.api.annotations.ParameterObject Pageable pageable,
+        ServerHttpRequest request
+    ) {
+        log.debug("REST request to search for a page of Placeholders for query {}", query);
+        return placeholderService
+            .searchCount()
+            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
+            .map(page -> PaginationUtil.generatePaginationHttpHeaders(UriComponentsBuilder.fromHttpRequest(request), page))
+            .map(headers -> ResponseEntity.ok().headers(headers).body(placeholderService.search(query, pageable)));
+    }
 }

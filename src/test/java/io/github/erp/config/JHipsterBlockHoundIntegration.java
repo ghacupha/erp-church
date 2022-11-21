@@ -13,5 +13,6 @@ public class JHipsterBlockHoundIntegration implements BlockHoundIntegration {
         builder.allowBlockingCallsInside("org.springframework.validation.beanvalidation.SpringValidatorAdapter", "validate");
         builder.allowBlockingCallsInside("io.github.erp.service.MailService", "sendEmailFromTemplate");
         builder.allowBlockingCallsInside("io.github.erp.security.DomainUserDetailsService", "createSpringSecurityUser");
+        builder.allowBlockingCallsInside("org.elasticsearch.client.indices.CreateIndexRequest", "settings");
     }
 }

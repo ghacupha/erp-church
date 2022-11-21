@@ -12,10 +12,8 @@ services:
       - SPRING_R2DBC_URL=r2dbc:postgresql://erpchurch-postgresql:5432/erpChurch
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://erpchurch-postgresql:5432/erpChurch
       - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
-      - ERP_CHURCH_PROD_DB=${ERP_CHURCH_PROD_DB}
-      - PG_DATABASE_PROD_USER=${PG_DATABASE_PROD_USER}
-      - PG_DATABASE_PROD_PASSWORD=${PG_DATABASE_PROD_PASSWORD}
-      - ERP_CHURCH_PROD_PORT=${ERP_CHURCH_PROD_PORT}
+      # - SPRING_ELASTICSEARCH_URIS=http://erpchurch-elasticsearch:9200
+      - SPRING_ELASTICSEARCH_REST_URIS=${SPRING_DATA_JEST_URI}
     # If you want to expose these ports outside your dev PC,
     # remove the "127.0.0.1:" prefix
     ports:
@@ -32,6 +30,18 @@ services:
     # remove the "127.0.0.1:" prefix
     ports:
       - 127.0.0.1:5432:5432
+  erpchurch-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.4
+    # volumes:
+    #   - ~/volumes/jhipster/erpChurch/elasticsearch/:/usr/share/elasticsearch/data/
+    # If you want to expose these ports outside your dev PC,
+    # remove the "127.0.0.1:" prefix
+    ports:
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9300:9300
+    environment:
+      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
+      - 'discovery.type=single-node'
   jhipster-registry:
     image: jhipster/jhipster-registry:v7.3.0
     volumes:

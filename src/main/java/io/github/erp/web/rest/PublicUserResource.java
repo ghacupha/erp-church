@@ -1,5 +1,6 @@
 package io.github.erp.web.rest;
 
+import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.service.UserService;
 import io.github.erp.service.dto.UserDTO;
 import java.util.ArrayList;
@@ -32,9 +33,11 @@ public class PublicUserResource {
     private final Logger log = LoggerFactory.getLogger(PublicUserResource.class);
 
     private final UserService userService;
+    private final UserSearchRepository userSearchRepository;
 
-    public PublicUserResource(UserService userService) {
+    public PublicUserResource(UserSearchRepository userSearchRepository, UserService userService) {
         this.userService = userService;
+        this.userSearchRepository = userSearchRepository;
     }
 
     /**
@@ -72,5 +75,16 @@ public class PublicUserResource {
     @GetMapping("/authorities")
     public Mono<List<String>> getAuthorities() {
         return userService.getAuthorities().collectList();
+    }
+
+    /**
+     * {@code SEARCH /_search/users/:query} : search for the User corresponding to the query.
+     *
+     * @param query the query to search.
+     * @return the result of the search.
+     */
+    @GetMapping("/_search/users/{query}")
+    public Mono<List<UserDTO>> search(@PathVariable String query) {
+        return userSearchRepository.search(query).map(UserDTO::new).collectList();
     }
 }

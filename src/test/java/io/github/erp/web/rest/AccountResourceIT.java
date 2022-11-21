@@ -2,12 +2,14 @@ package io.github.erp.web.rest;
 
 import static io.github.erp.web.rest.AccountResourceIT.TEST_USER_LOGIN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 import io.github.erp.IntegrationTest;
 import io.github.erp.config.Constants;
 import io.github.erp.domain.User;
 import io.github.erp.repository.AuthorityRepository;
 import io.github.erp.repository.UserRepository;
+import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.security.AuthoritiesConstants;
 import io.github.erp.service.UserService;
 import io.github.erp.service.dto.AdminUserDTO;
@@ -26,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for the {@link AccountResource} REST controller.

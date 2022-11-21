@@ -21,10 +21,12 @@
     <logger name="com.sun" level="WARN"/>
     <logger name="com.zaxxer" level="WARN"/>
     <logger name="io.netty" level="WARN"/>
+    <logger name="io.searchbox" level="WARN"/>
     <logger name="io.r2dbc" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
     <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
     <logger name="org.bson" level="WARN"/>
+    <logger name="org.elasticsearch" level="WARN"/>
     <logger name="org.hibernate.validator" level="WARN"/>
     <logger name="org.postgresql.jdbc" level="WARN"/>
     <logger name="org.springframework" level="WARN"/>

@@ -57,6 +57,12 @@ public interface PlaceholderService {
     Mono<Long> countAll();
 
     /**
+     * Returns the number of placeholders available in search repository.
+     *
+     */
+    Mono<Long> searchCount();
+
+    /**
      * Get the "id" placeholder.
      *
      * @param id the id of the entity.
@@ -71,4 +77,14 @@ public interface PlaceholderService {
      * @return a Mono to signal the deletion
      */
     Mono<Void> delete(Long id);
+
+    /**
+     * Search for the placeholder corresponding to the query.
+     *
+     * @param query the query of the search.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    Flux<PlaceholderDTO> search(String query, Pageable pageable);
 }
