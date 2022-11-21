@@ -12,8 +12,7 @@ services:
       - SPRING_R2DBC_URL=r2dbc:postgresql://erpchurch-postgresql:5432/erpChurch
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://erpchurch-postgresql:5432/erpChurch
       - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
-      # - SPRING_ELASTICSEARCH_URIS=http://erpchurch-elasticsearch:9200
-      - SPRING_ELASTICSEARCH_REST_URIS=${SPRING_DATA_JEST_URI}
+      - SPRING_ELASTICSEARCH_URIS=http://erpchurch-elasticsearch:9200
     # If you want to expose these ports outside your dev PC,
     # remove the "127.0.0.1:" prefix
     ports:

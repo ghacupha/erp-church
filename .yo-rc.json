@@ -46,7 +46,7 @@
     "skipFakeData": false,
     "skipUserManagement": false,
     "testFrameworks": ["cypress", "protractor", "gatling", "cucumber"],
-    "websocket": "spring-websocket",
+    "websocket": false,
     "withAdminUi": true
   }
 }
