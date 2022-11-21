@@ -1,0 +1,28 @@
+{
+  "changelogDate": "20221121102748",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "placeholderIndex",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "placeholderValue",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "Placeholder",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "placeholderValue",
+      "otherEntityName": "placeholder",
+      "relationshipName": "archetype",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}
