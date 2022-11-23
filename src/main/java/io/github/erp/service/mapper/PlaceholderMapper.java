@@ -18,7 +18,9 @@ package io.github.erp.service.mapper;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import io.github.erp.domain.AppUser;
 import io.github.erp.domain.Placeholder;
+import io.github.erp.service.dto.AppUserDTO;
 import io.github.erp.service.dto.PlaceholderDTO;
 import org.mapstruct.*;
 
@@ -28,6 +30,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface PlaceholderMapper extends EntityMapper<PlaceholderDTO, Placeholder> {
     @Mapping(target = "archetype", source = "archetype", qualifiedByName = "placeholderPlaceholderValue")
+    @Mapping(target = "organization", source = "organization", qualifiedByName = "appUserDesignation")
     PlaceholderDTO toDto(Placeholder s);
 
     @Named("placeholderPlaceholderValue")
@@ -35,4 +38,10 @@ public interface PlaceholderMapper extends EntityMapper<PlaceholderDTO, Placehol
     @Mapping(target = "id", source = "id")
     @Mapping(target = "placeholderValue", source = "placeholderValue")
     PlaceholderDTO toDtoPlaceholderPlaceholderValue(Placeholder placeholder);
+
+    @Named("appUserDesignation")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "designation", source = "designation")
+    AppUserDTO toDtoAppUserDesignation(AppUser appUser);
 }

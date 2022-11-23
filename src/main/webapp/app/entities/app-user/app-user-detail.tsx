@@ -34,17 +34,6 @@ export const AppUserDetail = () => {
           <dd>{appUserEntity.designation}</dd>
           <dt>System User</dt>
           <dd>{appUserEntity.systemUser ? appUserEntity.systemUser.login : ''}</dd>
-          <dt>Placeholder</dt>
-          <dd>
-            {appUserEntity.placeholders
-              ? appUserEntity.placeholders.map((val, i) => (
-                  <span key={val.id}>
-                    <a>{val.placeholderValue}</a>
-                    {appUserEntity.placeholders && i === appUserEntity.placeholders.length - 1 ? '' : ', '}
-                  </span>
-                ))
-              : null}
-          </dd>
           <dt>Organization</dt>
           <dd>{appUserEntity.organization ? appUserEntity.organization.designation : ''}</dd>
         </dl>

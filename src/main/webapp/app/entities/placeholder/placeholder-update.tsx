@@ -9,6 +9,8 @@ import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities as getPlaceholders } from 'app/entities/placeholder/placeholder.reducer';
+import { IAppUser } from 'app/shared/model/app-user.model';
+import { getEntities as getAppUsers } from 'app/entities/app-user/app-user.reducer';
 import { IPlaceholder } from 'app/shared/model/placeholder.model';
 import { getEntity, updateEntity, createEntity, reset } from './placeholder.reducer';
 
@@ -21,6 +23,7 @@ export const PlaceholderUpdate = () => {
   const isNew = id === undefined;
 
   const placeholders = useAppSelector(state => state.placeholder.entities);
+  const appUsers = useAppSelector(state => state.appUser.entities);
   const placeholderEntity = useAppSelector(state => state.placeholder.entity);
   const loading = useAppSelector(state => state.placeholder.loading);
   const updating = useAppSelector(state => state.placeholder.updating);
@@ -38,6 +41,7 @@ export const PlaceholderUpdate = () => {
     }
 
     dispatch(getPlaceholders({}));
+    dispatch(getAppUsers({}));
   }, []);
 
   useEffect(() => {
@@ -51,6 +55,7 @@ export const PlaceholderUpdate = () => {
       ...placeholderEntity,
       ...values,
       archetype: placeholders.find(it => it.id.toString() === values.archetype.toString()),
+      organization: appUsers.find(it => it.id.toString() === values.organization.toString()),
     };
 
     if (isNew) {
@@ -66,6 +71,7 @@ export const PlaceholderUpdate = () => {
       : {
           ...placeholderEntity,
           archetype: placeholderEntity?.archetype?.id,
+          organization: placeholderEntity?.organization?.id,
         };
 
   return (
@@ -111,6 +117,24 @@ export const PlaceholderUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
+              <ValidatedField
+                id="placeholder-organization"
+                name="organization"
+                data-cy="organization"
+                label="Organization"
+                type="select"
+                required
+              >
+                <option value="" key="0" />
+                {appUsers
+                  ? appUsers.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.designation}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <FormText>This field is required.</FormText>
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/placeholder" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

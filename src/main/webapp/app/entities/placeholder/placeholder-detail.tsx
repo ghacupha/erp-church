@@ -38,6 +38,8 @@ export const PlaceholderDetail = () => {
           <dd>{placeholderEntity.placeholderValue}</dd>
           <dt>Archetype</dt>
           <dd>{placeholderEntity.archetype ? placeholderEntity.archetype.placeholderValue : ''}</dd>
+          <dt>Organization</dt>
+          <dd>{placeholderEntity.organization ? placeholderEntity.organization.designation : ''}</dd>
         </dl>
         <Button tag={Link} to="/placeholder" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>

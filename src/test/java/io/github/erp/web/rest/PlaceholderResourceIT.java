@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 import io.github.erp.IntegrationTest;
+import io.github.erp.domain.AppUser;
 import io.github.erp.domain.Placeholder;
 import io.github.erp.repository.EntityManager;
 import io.github.erp.repository.PlaceholderRepository;
@@ -109,6 +110,10 @@ class PlaceholderResourceIT {
      */
     public static Placeholder createEntity(EntityManager em) {
         Placeholder placeholder = new Placeholder().placeholderIndex(DEFAULT_PLACEHOLDER_INDEX).placeholderValue(DEFAULT_PLACEHOLDER_VALUE);
+        // Add required entity
+        AppUser appUser;
+        appUser = em.insert(AppUserResourceIT.createEntity(em)).block();
+        placeholder.setOrganization(appUser);
         return placeholder;
     }
 
@@ -120,6 +125,10 @@ class PlaceholderResourceIT {
      */
     public static Placeholder createUpdatedEntity(EntityManager em) {
         Placeholder placeholder = new Placeholder().placeholderIndex(UPDATED_PLACEHOLDER_INDEX).placeholderValue(UPDATED_PLACEHOLDER_VALUE);
+        // Add required entity
+        AppUser appUser;
+        appUser = em.insert(AppUserResourceIT.createUpdatedEntity(em)).block();
+        placeholder.setOrganization(appUser);
         return placeholder;
     }
 
@@ -129,6 +138,7 @@ class PlaceholderResourceIT {
         } catch (Exception e) {
             // It can fail, if other entities are still referring this - it will be removed later.
         }
+        AppUserResourceIT.deleteEntities(em);
     }
 
     @AfterEach

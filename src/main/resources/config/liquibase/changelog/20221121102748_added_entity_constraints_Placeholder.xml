@@ -13,5 +13,11 @@
                                  constraintName="fk_placeholder__archetype_id"
                                  referencedColumnNames="id"
                                  referencedTableName="placeholder"/>
+
+        <addForeignKeyConstraint baseColumnNames="organization_id"
+                                 baseTableName="placeholder"
+                                 constraintName="fk_placeholder__organization_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="app_user"/>
     </changeSet>
 </databaseChangeLog>

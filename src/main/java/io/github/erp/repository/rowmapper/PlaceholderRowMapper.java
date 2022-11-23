@@ -46,6 +46,7 @@ public class PlaceholderRowMapper implements BiFunction<Row, String, Placeholder
         entity.setPlaceholderIndex(converter.fromRow(row, prefix + "_placeholder_index", String.class));
         entity.setPlaceholderValue(converter.fromRow(row, prefix + "_placeholder_value", String.class));
         entity.setArchetypeId(converter.fromRow(row, prefix + "_archetype_id", Long.class));
+        entity.setOrganizationId(converter.fromRow(row, prefix + "_organization_id", Long.class));
         return entity;
     }
 }

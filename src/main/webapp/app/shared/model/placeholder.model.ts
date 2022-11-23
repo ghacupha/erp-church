@@ -16,11 +16,14 @@
 /// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ///
 
+import { IAppUser } from 'app/shared/model/app-user.model';
+
 export interface IPlaceholder {
   id?: number;
   placeholderIndex?: string;
   placeholderValue?: string | null;
   archetype?: IPlaceholder | null;
+  organization?: IAppUser;
 }
 
 export const defaultValue: Readonly<IPlaceholder> = {};

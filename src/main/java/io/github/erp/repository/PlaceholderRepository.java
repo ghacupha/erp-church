@@ -50,6 +50,12 @@ public interface PlaceholderRepository extends ReactiveCrudRepository<Placeholde
     @Query("SELECT * FROM placeholder entity WHERE entity.archetype_id IS NULL")
     Flux<Placeholder> findAllWhereArchetypeIsNull();
 
+    @Query("SELECT * FROM placeholder entity WHERE entity.organization_id = :id")
+    Flux<Placeholder> findByOrganization(Long id);
+
+    @Query("SELECT * FROM placeholder entity WHERE entity.organization_id IS NULL")
+    Flux<Placeholder> findAllWhereOrganizationIsNull();
+
     @Override
     <S extends Placeholder> Mono<S> save(S entity);
 

@@ -50,11 +50,6 @@ public interface AppUserRepository extends ReactiveCrudRepository<AppUser, Long>
     @Query("SELECT * FROM app_user entity WHERE entity.system_user_id IS NULL")
     Flux<AppUser> findAllWhereSystemUserIsNull();
 
-    @Query(
-        "SELECT entity.* FROM app_user entity JOIN rel_app_user__placeholder joinTable ON entity.id = joinTable.placeholder_id WHERE joinTable.placeholder_id = :id"
-    )
-    Flux<AppUser> findByPlaceholder(Long id);
-
     @Query("SELECT * FROM app_user entity WHERE entity.organization_id = :id")
     Flux<AppUser> findByOrganization(Long id);
 

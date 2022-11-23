@@ -48,11 +48,18 @@ public class Placeholder implements Serializable {
     private String placeholderValue;
 
     @Transient
-    @JsonIgnoreProperties(value = { "archetype" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "archetype", "organization" }, allowSetters = true)
     private Placeholder archetype;
+
+    @Transient
+    @JsonIgnoreProperties(value = { "systemUser", "organization" }, allowSetters = true)
+    private AppUser organization;
 
     @Column("archetype_id")
     private Long archetypeId;
+
+    @Column("organization_id")
+    private Long organizationId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -109,12 +116,34 @@ public class Placeholder implements Serializable {
         return this;
     }
 
+    public AppUser getOrganization() {
+        return this.organization;
+    }
+
+    public void setOrganization(AppUser appUser) {
+        this.organization = appUser;
+        this.organizationId = appUser != null ? appUser.getId() : null;
+    }
+
+    public Placeholder organization(AppUser appUser) {
+        this.setOrganization(appUser);
+        return this;
+    }
+
     public Long getArchetypeId() {
         return this.archetypeId;
     }
 
     public void setArchetypeId(Long placeholder) {
         this.archetypeId = placeholder;
+    }
+
+    public Long getOrganizationId() {
+        return this.organizationId;
+    }
+
+    public void setOrganizationId(Long appUser) {
+        this.organizationId = appUser;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

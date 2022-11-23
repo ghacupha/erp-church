@@ -129,7 +129,6 @@ class AppUserResourceIT {
 
     public static void deleteEntities(EntityManager em) {
         try {
-            em.deleteAll("rel_app_user__placeholder").block();
             em.deleteAll(AppUser.class).block();
         } catch (Exception e) {
             // It can fail, if other entities are still referring this - it will be removed later.

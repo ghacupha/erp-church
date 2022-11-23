@@ -20,8 +20,6 @@ package io.github.erp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -50,11 +48,7 @@ public class AppUser implements Serializable {
     private User systemUser;
 
     @Transient
-    @JsonIgnoreProperties(value = { "archetype" }, allowSetters = true)
-    private Set<Placeholder> placeholders = new HashSet<>();
-
-    @Transient
-    @JsonIgnoreProperties(value = { "systemUser", "placeholders", "organization" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "systemUser", "organization" }, allowSetters = true)
     private AppUser organization;
 
     @Column("system_user_id")
@@ -102,29 +96,6 @@ public class AppUser implements Serializable {
 
     public AppUser systemUser(User user) {
         this.setSystemUser(user);
-        return this;
-    }
-
-    public Set<Placeholder> getPlaceholders() {
-        return this.placeholders;
-    }
-
-    public void setPlaceholders(Set<Placeholder> placeholders) {
-        this.placeholders = placeholders;
-    }
-
-    public AppUser placeholders(Set<Placeholder> placeholders) {
-        this.setPlaceholders(placeholders);
-        return this;
-    }
-
-    public AppUser addPlaceholder(Placeholder placeholder) {
-        this.placeholders.add(placeholder);
-        return this;
-    }
-
-    public AppUser removePlaceholder(Placeholder placeholder) {
-        this.placeholders.remove(placeholder);
         return this;
     }
 

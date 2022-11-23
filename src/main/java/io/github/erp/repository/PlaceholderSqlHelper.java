@@ -33,6 +33,7 @@ public class PlaceholderSqlHelper {
         columns.add(Column.aliased("placeholder_value", table, columnPrefix + "_placeholder_value"));
 
         columns.add(Column.aliased("archetype_id", table, columnPrefix + "_archetype_id"));
+        columns.add(Column.aliased("organization_id", table, columnPrefix + "_organization_id"));
         return columns;
     }
 }

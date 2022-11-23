@@ -21,6 +21,7 @@ package io.github.erp.repository;
 import static org.springframework.data.relational.core.query.Criteria.where;
 
 import io.github.erp.domain.Placeholder;
+import io.github.erp.repository.rowmapper.AppUserRowMapper;
 import io.github.erp.repository.rowmapper.PlaceholderRowMapper;
 import io.github.erp.repository.rowmapper.PlaceholderRowMapper;
 import io.r2dbc.spi.Row;
@@ -63,14 +64,17 @@ class PlaceholderRepositoryInternalImpl extends SimpleR2dbcRepository<Placeholde
     private final EntityManager entityManager;
 
     private final PlaceholderRowMapper placeholderMapper;
+    private final AppUserRowMapper appuserMapper;
 
     private static final Table entityTable = Table.aliased("placeholder", EntityManager.ENTITY_ALIAS);
     private static final Table archetypeTable = Table.aliased("placeholder", "archetype");
+    private static final Table organizationTable = Table.aliased("app_user", "e_organization");
 
     public PlaceholderRepositoryInternalImpl(
         R2dbcEntityTemplate template,
         EntityManager entityManager,
         PlaceholderRowMapper placeholderMapper,
+        AppUserRowMapper appuserMapper,
         R2dbcEntityOperations entityOperations,
         R2dbcConverter converter
     ) {
@@ -83,6 +87,7 @@ class PlaceholderRepositoryInternalImpl extends SimpleR2dbcRepository<Placeholde
         this.r2dbcEntityTemplate = template;
         this.entityManager = entityManager;
         this.placeholderMapper = placeholderMapper;
+        this.appuserMapper = appuserMapper;
     }
 
     @Override
@@ -93,13 +98,17 @@ class PlaceholderRepositoryInternalImpl extends SimpleR2dbcRepository<Placeholde
     RowsFetchSpec<Placeholder> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = PlaceholderSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
         columns.addAll(PlaceholderSqlHelper.getColumns(archetypeTable, "archetype"));
+        columns.addAll(AppUserSqlHelper.getColumns(organizationTable, "organization"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
             .from(entityTable)
             .leftOuterJoin(archetypeTable)
             .on(Column.create("archetype_id", entityTable))
-            .equals(Column.create("id", archetypeTable));
+            .equals(Column.create("id", archetypeTable))
+            .leftOuterJoin(organizationTable)
+            .on(Column.create("organization_id", entityTable))
+            .equals(Column.create("id", organizationTable));
         // we do not support Criteria here for now as of https://github.com/jhipster/generator-jhipster/issues/18269
         String select = entityManager.createSelect(selectFrom, Placeholder.class, pageable, whereClause);
         return db.sql(select).map(this::process);
@@ -134,6 +143,7 @@ class PlaceholderRepositoryInternalImpl extends SimpleR2dbcRepository<Placeholde
     private Placeholder process(Row row, RowMetadata metadata) {
         Placeholder entity = placeholderMapper.apply(row, "e");
         entity.setArchetype(placeholderMapper.apply(row, "archetype"));
+        entity.setOrganization(appuserMapper.apply(row, "organization"));
         return entity;
     }
 

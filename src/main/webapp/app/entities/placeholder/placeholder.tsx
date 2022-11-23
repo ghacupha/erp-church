@@ -170,6 +170,9 @@ export const Placeholder = () => {
                 <th>
                   Archetype <FontAwesomeIcon icon="sort" />
                 </th>
+                <th>
+                  Organization <FontAwesomeIcon icon="sort" />
+                </th>
                 <th />
               </tr>
             </thead>
@@ -186,6 +189,13 @@ export const Placeholder = () => {
                   <td>
                     {placeholder.archetype ? (
                       <Link to={`/placeholder/${placeholder.archetype.id}`}>{placeholder.archetype.placeholderValue}</Link>
+                    ) : (
+                      ''
+                    )}
+                  </td>
+                  <td>
+                    {placeholder.organization ? (
+                      <Link to={`/app-user/${placeholder.organization.id}`}>{placeholder.organization.designation}</Link>
                     ) : (
                       ''
                     )}

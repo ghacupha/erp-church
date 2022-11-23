@@ -23,6 +23,9 @@
             <column name="archetype_id" type="bigint">
                 <constraints nullable="true" />
             </column>
+            <column name="organization_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
@@ -46,6 +49,7 @@
             <column name="id" type="numeric"/>
             <column name="placeholder_index" type="string"/>
             <column name="placeholder_value" type="string"/>
+            <column name="organization_id" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

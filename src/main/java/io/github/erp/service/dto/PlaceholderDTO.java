@@ -37,6 +37,8 @@ public class PlaceholderDTO implements Serializable {
 
     private PlaceholderDTO archetype;
 
+    private AppUserDTO organization;
+
     public Long getId() {
         return id;
     }
@@ -69,6 +71,14 @@ public class PlaceholderDTO implements Serializable {
         this.archetype = archetype;
     }
 
+    public AppUserDTO getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(AppUserDTO organization) {
+        this.organization = organization;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -98,6 +108,7 @@ public class PlaceholderDTO implements Serializable {
             ", placeholderIndex='" + getPlaceholderIndex() + "'" +
             ", placeholderValue='" + getPlaceholderValue() + "'" +
             ", archetype=" + getArchetype() +
+            ", organization=" + getOrganization() +
             "}";
     }
 }

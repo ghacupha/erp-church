@@ -23,14 +23,6 @@
       "relationshipValidateRules": ["required"]
     },
     {
-      "otherEntityField": "placeholderValue",
-      "otherEntityName": "placeholder",
-      "otherEntityRelationshipName": "appUser",
-      "ownerSide": true,
-      "relationshipName": "placeholder",
-      "relationshipType": "many-to-many"
-    },
-    {
       "otherEntityField": "designation",
       "otherEntityName": "appUser",
       "relationshipName": "organization",

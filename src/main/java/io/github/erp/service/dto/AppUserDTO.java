@@ -19,9 +19,7 @@ package io.github.erp.service.dto;
  */
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import javax.validation.constraints.*;
 
 /**
@@ -36,8 +34,6 @@ public class AppUserDTO implements Serializable {
     private String designation;
 
     private UserDTO systemUser;
-
-    private Set<PlaceholderDTO> placeholders = new HashSet<>();
 
     private AppUserDTO organization;
 
@@ -63,14 +59,6 @@ public class AppUserDTO implements Serializable {
 
     public void setSystemUser(UserDTO systemUser) {
         this.systemUser = systemUser;
-    }
-
-    public Set<PlaceholderDTO> getPlaceholders() {
-        return placeholders;
-    }
-
-    public void setPlaceholders(Set<PlaceholderDTO> placeholders) {
-        this.placeholders = placeholders;
     }
 
     public AppUserDTO getOrganization() {
@@ -109,7 +97,6 @@ public class AppUserDTO implements Serializable {
             "id=" + getId() +
             ", designation='" + getDesignation() + "'" +
             ", systemUser=" + getSystemUser() +
-            ", placeholders=" + getPlaceholders() +
             ", organization=" + getOrganization() +
             "}";
     }

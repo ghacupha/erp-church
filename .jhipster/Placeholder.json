@@ -22,6 +22,15 @@
       "otherEntityName": "placeholder",
       "relationshipName": "archetype",
       "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "designation",
+      "otherEntityName": "appUser",
+      "otherEntityRelationshipName": "placeholder",
+      "ownerSide": true,
+      "relationshipName": "organization",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": ["required"]
     }
   ],
   "service": "serviceImpl"

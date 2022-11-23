@@ -14,18 +14,6 @@
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"/>
 
-        <addForeignKeyConstraint baseColumnNames="app_user_id"
-                                 baseTableName="rel_app_user__placeholder"
-                                 constraintName="fk_rel_app_user__placeholder__app_user_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="app_user"/>
-
-        <addForeignKeyConstraint baseColumnNames="placeholder_id"
-                                 baseTableName="rel_app_user__placeholder"
-                                 constraintName="fk_rel_app_user__placeholder__placeholder_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="placeholder"/>
-
         <addForeignKeyConstraint baseColumnNames="organization_id"
                                  baseTableName="app_user"
                                  constraintName="fk_app_user__organization_id"

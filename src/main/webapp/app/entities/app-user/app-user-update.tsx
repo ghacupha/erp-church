@@ -10,8 +10,6 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IUser } from 'app/shared/model/user.model';
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
-import { IPlaceholder } from 'app/shared/model/placeholder.model';
-import { getEntities as getPlaceholders } from 'app/entities/placeholder/placeholder.reducer';
 import { getEntities as getAppUsers } from 'app/entities/app-user/app-user.reducer';
 import { IAppUser } from 'app/shared/model/app-user.model';
 import { getEntity, updateEntity, createEntity, reset } from './app-user.reducer';
@@ -25,7 +23,6 @@ export const AppUserUpdate = () => {
   const isNew = id === undefined;
 
   const users = useAppSelector(state => state.userManagement.users);
-  const placeholders = useAppSelector(state => state.placeholder.entities);
   const appUsers = useAppSelector(state => state.appUser.entities);
   const appUserEntity = useAppSelector(state => state.appUser.entity);
   const loading = useAppSelector(state => state.appUser.loading);
@@ -44,7 +41,6 @@ export const AppUserUpdate = () => {
     }
 
     dispatch(getUsers({}));
-    dispatch(getPlaceholders({}));
     dispatch(getAppUsers({}));
   }, []);
 
@@ -58,7 +54,6 @@ export const AppUserUpdate = () => {
     const entity = {
       ...appUserEntity,
       ...values,
-      placeholders: mapIdList(values.placeholders),
       systemUser: users.find(it => it.id.toString() === values.systemUser.toString()),
       organization: appUsers.find(it => it.id.toString() === values.organization.toString()),
     };
@@ -76,7 +71,6 @@ export const AppUserUpdate = () => {
       : {
           ...appUserEntity,
           systemUser: appUserEntity?.systemUser?.id,
-          placeholders: appUserEntity?.placeholders?.map(e => e.id.toString()),
           organization: appUserEntity?.organization?.id,
         };
 
@@ -117,23 +111,6 @@ export const AppUserUpdate = () => {
                   : null}
               </ValidatedField>
               <FormText>This field is required.</FormText>
-              <ValidatedField
-                label="Placeholder"
-                id="app-user-placeholder"
-                data-cy="placeholder"
-                type="select"
-                multiple
-                name="placeholders"
-              >
-                <option value="" key="0" />
-                {placeholders
-                  ? placeholders.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.placeholderValue}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
               <ValidatedField id="app-user-organization" name="organization" data-cy="organization" label="Organization" type="select">
                 <option value="" key="0" />
                 {appUsers

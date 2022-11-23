@@ -19,10 +19,8 @@ package io.github.erp.repository;
  */
 
 import static org.springframework.data.relational.core.query.Criteria.where;
-import static org.springframework.data.relational.core.query.Query.query;
 
 import io.github.erp.domain.AppUser;
-import io.github.erp.domain.Placeholder;
 import io.github.erp.repository.rowmapper.AppUserRowMapper;
 import io.github.erp.repository.rowmapper.AppUserRowMapper;
 import io.github.erp.repository.rowmapper.UserRowMapper;
@@ -71,12 +69,6 @@ class AppUserRepositoryInternalImpl extends SimpleR2dbcRepository<AppUser, Long>
     private static final Table entityTable = Table.aliased("app_user", EntityManager.ENTITY_ALIAS);
     private static final Table systemUserTable = Table.aliased("jhi_user", "systemUser");
     private static final Table organizationTable = Table.aliased("app_user", "e_organization");
-
-    private static final EntityManager.LinkTable placeholderLink = new EntityManager.LinkTable(
-        "rel_app_user__placeholder",
-        "app_user_id",
-        "placeholder_id"
-    );
 
     public AppUserRepositoryInternalImpl(
         R2dbcEntityTemplate template,
@@ -157,22 +149,6 @@ class AppUserRepositoryInternalImpl extends SimpleR2dbcRepository<AppUser, Long>
 
     @Override
     public <S extends AppUser> Mono<S> save(S entity) {
-        return super.save(entity).flatMap((S e) -> updateRelations(e));
-    }
-
-    protected <S extends AppUser> Mono<S> updateRelations(S entity) {
-        Mono<Void> result = entityManager
-            .updateLinkTable(placeholderLink, entity.getId(), entity.getPlaceholders().stream().map(Placeholder::getId))
-            .then();
-        return result.thenReturn(entity);
-    }
-
-    @Override
-    public Mono<Void> deleteById(Long entityId) {
-        return deleteRelations(entityId).then(super.deleteById(entityId));
-    }
-
-    protected Mono<Void> deleteRelations(Long entityId) {
-        return entityManager.deleteFromLinkTable(placeholderLink, entityId);
+        return super.save(entity);
     }
 }
