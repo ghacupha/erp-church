@@ -20,6 +20,7 @@ package io.github.erp.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -33,9 +34,14 @@ public class AppUserDTO implements Serializable {
     @NotNull(message = "must not be null")
     private String designation;
 
-    private UserDTO systemUser;
+    @NotNull(message = "must not be null")
+    private UUID identifier;
+
+    private Boolean isCorporateAccount;
 
     private AppUserDTO organization;
+
+    private UserDTO systemUser;
 
     public Long getId() {
         return id;
@@ -53,12 +59,20 @@ public class AppUserDTO implements Serializable {
         this.designation = designation;
     }
 
-    public UserDTO getSystemUser() {
-        return systemUser;
+    public UUID getIdentifier() {
+        return identifier;
     }
 
-    public void setSystemUser(UserDTO systemUser) {
-        this.systemUser = systemUser;
+    public void setIdentifier(UUID identifier) {
+        this.identifier = identifier;
+    }
+
+    public Boolean getIsCorporateAccount() {
+        return isCorporateAccount;
+    }
+
+    public void setIsCorporateAccount(Boolean isCorporateAccount) {
+        this.isCorporateAccount = isCorporateAccount;
     }
 
     public AppUserDTO getOrganization() {
@@ -67,6 +81,14 @@ public class AppUserDTO implements Serializable {
 
     public void setOrganization(AppUserDTO organization) {
         this.organization = organization;
+    }
+
+    public UserDTO getSystemUser() {
+        return systemUser;
+    }
+
+    public void setSystemUser(UserDTO systemUser) {
+        this.systemUser = systemUser;
     }
 
     @Override
@@ -96,8 +118,10 @@ public class AppUserDTO implements Serializable {
         return "AppUserDTO{" +
             "id=" + getId() +
             ", designation='" + getDesignation() + "'" +
-            ", systemUser=" + getSystemUser() +
+            ", identifier='" + getIdentifier() + "'" +
+            ", isCorporateAccount='" + getIsCorporateAccount() + "'" +
             ", organization=" + getOrganization() +
+            ", systemUser=" + getSystemUser() +
             "}";
     }
 }

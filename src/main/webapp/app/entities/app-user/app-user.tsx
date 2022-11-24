@@ -164,11 +164,17 @@ export const AppUser = () => {
                 <th className="hand" onClick={sort('designation')}>
                   Designation <FontAwesomeIcon icon="sort" />
                 </th>
-                <th>
-                  System User <FontAwesomeIcon icon="sort" />
+                <th className="hand" onClick={sort('identifier')}>
+                  Identifier <FontAwesomeIcon icon="sort" />
+                </th>
+                <th className="hand" onClick={sort('isCorporateAccount')}>
+                  Is Corporate Account <FontAwesomeIcon icon="sort" />
                 </th>
                 <th>
                   Organization <FontAwesomeIcon icon="sort" />
+                </th>
+                <th>
+                  System User <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
               </tr>
@@ -182,7 +188,8 @@ export const AppUser = () => {
                     </Button>
                   </td>
                   <td>{appUser.designation}</td>
-                  <td>{appUser.systemUser ? appUser.systemUser.login : ''}</td>
+                  <td>{appUser.identifier}</td>
+                  <td>{appUser.isCorporateAccount ? 'true' : 'false'}</td>
                   <td>
                     {appUser.organization ? (
                       <Link to={`/app-user/${appUser.organization.id}`}>{appUser.organization.designation}</Link>
@@ -190,6 +197,7 @@ export const AppUser = () => {
                       ''
                     )}
                   </td>
+                  <td>{appUser.systemUser ? appUser.systemUser.login : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/app-user/${appUser.id}`} color="info" size="sm" data-cy="entityDetailsButton">

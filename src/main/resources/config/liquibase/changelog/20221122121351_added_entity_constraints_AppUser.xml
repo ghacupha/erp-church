@@ -8,16 +8,16 @@
     -->
     <changeSet id="20221122121351-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="system_user_id"
-                                 baseTableName="app_user"
-                                 constraintName="fk_app_user__system_user_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="jhi_user"/>
-
         <addForeignKeyConstraint baseColumnNames="organization_id"
                                  baseTableName="app_user"
                                  constraintName="fk_app_user__organization_id"
                                  referencedColumnNames="id"
                                  referencedTableName="app_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="system_user_id"
+                                 baseTableName="app_user"
+                                 constraintName="fk_app_user__system_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
     </changeSet>
 </databaseChangeLog>

@@ -44,17 +44,17 @@ public interface AppUserRepository extends ReactiveCrudRepository<AppUser, Long>
     @Override
     Flux<AppUser> findAllWithEagerRelationships(Pageable page);
 
-    @Query("SELECT * FROM app_user entity WHERE entity.system_user_id = :id")
-    Flux<AppUser> findBySystemUser(Long id);
-
-    @Query("SELECT * FROM app_user entity WHERE entity.system_user_id IS NULL")
-    Flux<AppUser> findAllWhereSystemUserIsNull();
-
     @Query("SELECT * FROM app_user entity WHERE entity.organization_id = :id")
     Flux<AppUser> findByOrganization(Long id);
 
     @Query("SELECT * FROM app_user entity WHERE entity.organization_id IS NULL")
     Flux<AppUser> findAllWhereOrganizationIsNull();
+
+    @Query("SELECT * FROM app_user entity WHERE entity.system_user_id = :id")
+    Flux<AppUser> findBySystemUser(Long id);
+
+    @Query("SELECT * FROM app_user entity WHERE entity.system_user_id IS NULL")
+    Flux<AppUser> findAllWhereSystemUserIsNull();
 
     @Override
     <S extends AppUser> Mono<S> save(S entity);

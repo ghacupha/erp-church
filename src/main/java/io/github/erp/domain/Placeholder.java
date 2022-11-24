@@ -52,7 +52,7 @@ public class Placeholder implements Serializable {
     private Placeholder archetype;
 
     @Transient
-    @JsonIgnoreProperties(value = { "systemUser", "organization" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "organization", "systemUser" }, allowSetters = true)
     private AppUser organization;
 
     @Column("archetype_id")

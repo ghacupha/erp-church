@@ -29,19 +29,19 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface AppUserMapper extends EntityMapper<AppUserDTO, AppUser> {
-    @Mapping(target = "systemUser", source = "systemUser", qualifiedByName = "userLogin")
     @Mapping(target = "organization", source = "organization", qualifiedByName = "appUserDesignation")
+    @Mapping(target = "systemUser", source = "systemUser", qualifiedByName = "userLogin")
     AppUserDTO toDto(AppUser s);
-
-    @Named("userLogin")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "login", source = "login")
-    UserDTO toDtoUserLogin(User user);
 
     @Named("appUserDesignation")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "designation", source = "designation")
     AppUserDTO toDtoAppUserDesignation(AppUser appUser);
+
+    @Named("userLogin")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "login", source = "login")
+    UserDTO toDtoUserLogin(User user);
 }

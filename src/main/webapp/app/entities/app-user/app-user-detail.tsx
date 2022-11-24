@@ -32,10 +32,18 @@ export const AppUserDetail = () => {
             <span id="designation">Designation</span>
           </dt>
           <dd>{appUserEntity.designation}</dd>
-          <dt>System User</dt>
-          <dd>{appUserEntity.systemUser ? appUserEntity.systemUser.login : ''}</dd>
+          <dt>
+            <span id="identifier">Identifier</span>
+          </dt>
+          <dd>{appUserEntity.identifier}</dd>
+          <dt>
+            <span id="isCorporateAccount">Is Corporate Account</span>
+          </dt>
+          <dd>{appUserEntity.isCorporateAccount ? 'true' : 'false'}</dd>
           <dt>Organization</dt>
           <dd>{appUserEntity.organization ? appUserEntity.organization.designation : ''}</dd>
+          <dt>System User</dt>
+          <dd>{appUserEntity.systemUser ? appUserEntity.systemUser.login : ''}</dd>
         </dl>
         <Button tag={Link} to="/app-user" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>

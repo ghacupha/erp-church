@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
@@ -63,18 +64,18 @@ class AppUserRepositoryInternalImpl extends SimpleR2dbcRepository<AppUser, Long>
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
     private final EntityManager entityManager;
 
-    private final UserRowMapper userMapper;
     private final AppUserRowMapper appuserMapper;
+    private final UserRowMapper userMapper;
 
     private static final Table entityTable = Table.aliased("app_user", EntityManager.ENTITY_ALIAS);
-    private static final Table systemUserTable = Table.aliased("jhi_user", "systemUser");
     private static final Table organizationTable = Table.aliased("app_user", "e_organization");
+    private static final Table systemUserTable = Table.aliased("jhi_user", "systemUser");
 
     public AppUserRepositoryInternalImpl(
         R2dbcEntityTemplate template,
         EntityManager entityManager,
-        UserRowMapper userMapper,
         AppUserRowMapper appuserMapper,
+        UserRowMapper userMapper,
         R2dbcEntityOperations entityOperations,
         R2dbcConverter converter
     ) {
@@ -86,8 +87,8 @@ class AppUserRepositoryInternalImpl extends SimpleR2dbcRepository<AppUser, Long>
         this.db = template.getDatabaseClient();
         this.r2dbcEntityTemplate = template;
         this.entityManager = entityManager;
-        this.userMapper = userMapper;
         this.appuserMapper = appuserMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -97,18 +98,18 @@ class AppUserRepositoryInternalImpl extends SimpleR2dbcRepository<AppUser, Long>
 
     RowsFetchSpec<AppUser> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = AppUserSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
-        columns.addAll(UserSqlHelper.getColumns(systemUserTable, "systemUser"));
         columns.addAll(AppUserSqlHelper.getColumns(organizationTable, "organization"));
+        columns.addAll(UserSqlHelper.getColumns(systemUserTable, "systemUser"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
             .from(entityTable)
-            .leftOuterJoin(systemUserTable)
-            .on(Column.create("system_user_id", entityTable))
-            .equals(Column.create("id", systemUserTable))
             .leftOuterJoin(organizationTable)
             .on(Column.create("organization_id", entityTable))
-            .equals(Column.create("id", organizationTable));
+            .equals(Column.create("id", organizationTable))
+            .leftOuterJoin(systemUserTable)
+            .on(Column.create("system_user_id", entityTable))
+            .equals(Column.create("id", systemUserTable));
         // we do not support Criteria here for now as of https://github.com/jhipster/generator-jhipster/issues/18269
         String select = entityManager.createSelect(selectFrom, AppUser.class, pageable, whereClause);
         return db.sql(select).map(this::process);
@@ -142,8 +143,8 @@ class AppUserRepositoryInternalImpl extends SimpleR2dbcRepository<AppUser, Long>
 
     private AppUser process(Row row, RowMetadata metadata) {
         AppUser entity = appuserMapper.apply(row, "e");
-        entity.setSystemUser(userMapper.apply(row, "systemUser"));
         entity.setOrganization(appuserMapper.apply(row, "organization"));
+        entity.setSystemUser(userMapper.apply(row, "systemUser"));
         return entity;
     }
 

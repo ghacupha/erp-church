@@ -8,9 +8,9 @@ import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateT
 import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
+import { getEntities as getAppUsers } from 'app/entities/app-user/app-user.reducer';
 import { IUser } from 'app/shared/model/user.model';
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
-import { getEntities as getAppUsers } from 'app/entities/app-user/app-user.reducer';
 import { IAppUser } from 'app/shared/model/app-user.model';
 import { getEntity, updateEntity, createEntity, reset } from './app-user.reducer';
 
@@ -22,8 +22,8 @@ export const AppUserUpdate = () => {
   const { id } = useParams<'id'>();
   const isNew = id === undefined;
 
-  const users = useAppSelector(state => state.userManagement.users);
   const appUsers = useAppSelector(state => state.appUser.entities);
+  const users = useAppSelector(state => state.userManagement.users);
   const appUserEntity = useAppSelector(state => state.appUser.entity);
   const loading = useAppSelector(state => state.appUser.loading);
   const updating = useAppSelector(state => state.appUser.updating);
@@ -40,8 +40,8 @@ export const AppUserUpdate = () => {
       dispatch(getEntity(id));
     }
 
-    dispatch(getUsers({}));
     dispatch(getAppUsers({}));
+    dispatch(getUsers({}));
   }, []);
 
   useEffect(() => {
@@ -54,8 +54,8 @@ export const AppUserUpdate = () => {
     const entity = {
       ...appUserEntity,
       ...values,
-      systemUser: users.find(it => it.id.toString() === values.systemUser.toString()),
       organization: appUsers.find(it => it.id.toString() === values.organization.toString()),
+      systemUser: users.find(it => it.id.toString() === values.systemUser.toString()),
     };
 
     if (isNew) {
@@ -70,8 +70,8 @@ export const AppUserUpdate = () => {
       ? {}
       : {
           ...appUserEntity,
-          systemUser: appUserEntity?.systemUser?.id,
           organization: appUserEntity?.organization?.id,
+          systemUser: appUserEntity?.systemUser?.id,
         };
 
   return (
@@ -100,6 +100,34 @@ export const AppUserUpdate = () => {
                   required: { value: true, message: 'This field is required.' },
                 }}
               />
+              <ValidatedField
+                label="Identifier"
+                id="app-user-identifier"
+                name="identifier"
+                data-cy="identifier"
+                type="text"
+                validate={{
+                  required: { value: true, message: 'This field is required.' },
+                }}
+              />
+              <ValidatedField
+                label="Is Corporate Account"
+                id="app-user-isCorporateAccount"
+                name="isCorporateAccount"
+                data-cy="isCorporateAccount"
+                check
+                type="checkbox"
+              />
+              <ValidatedField id="app-user-organization" name="organization" data-cy="organization" label="Organization" type="select">
+                <option value="" key="0" />
+                {appUsers
+                  ? appUsers.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.designation}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
               <ValidatedField id="app-user-systemUser" name="systemUser" data-cy="systemUser" label="System User" type="select" required>
                 <option value="" key="0" />
                 {users
@@ -111,16 +139,6 @@ export const AppUserUpdate = () => {
                   : null}
               </ValidatedField>
               <FormText>This field is required.</FormText>
-              <ValidatedField id="app-user-organization" name="organization" data-cy="organization" label="Organization" type="select">
-                <option value="" key="0" />
-                {appUsers
-                  ? appUsers.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.designation}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/app-user" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

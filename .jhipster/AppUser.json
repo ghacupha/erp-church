@@ -6,6 +6,15 @@
       "fieldName": "designation",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "UUID",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "isCorporateAccount",
+      "fieldType": "Boolean"
     }
   ],
   "jpaMetamodelFiltering": false,
@@ -14,19 +23,20 @@
   "readOnly": false,
   "relationships": [
     {
+      "otherEntityField": "designation",
+      "otherEntityName": "appUser",
+      "relationshipName": "organization",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "id": false,
       "otherEntityField": "login",
       "otherEntityName": "user",
       "otherEntityRelationshipName": "appUser",
       "ownerSide": true,
       "relationshipName": "systemUser",
-      "relationshipType": "many-to-one",
+      "relationshipType": "one-to-one",
       "relationshipValidateRules": ["required"]
-    },
-    {
-      "otherEntityField": "designation",
-      "otherEntityName": "appUser",
-      "relationshipName": "organization",
-      "relationshipType": "many-to-one"
     }
   ],
   "service": "serviceImpl"

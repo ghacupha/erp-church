@@ -20,6 +20,7 @@ package io.github.erp.repository.rowmapper;
 
 import io.github.erp.domain.AppUser;
 import io.r2dbc.spi.Row;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +45,10 @@ public class AppUserRowMapper implements BiFunction<Row, String, AppUser> {
         AppUser entity = new AppUser();
         entity.setId(converter.fromRow(row, prefix + "_id", Long.class));
         entity.setDesignation(converter.fromRow(row, prefix + "_designation", String.class));
-        entity.setSystemUserId(converter.fromRow(row, prefix + "_system_user_id", Long.class));
+        entity.setIdentifier(converter.fromRow(row, prefix + "_identifier", UUID.class));
+        entity.setIsCorporateAccount(converter.fromRow(row, prefix + "_is_corporate_account", Boolean.class));
         entity.setOrganizationId(converter.fromRow(row, prefix + "_organization_id", Long.class));
+        entity.setSystemUserId(converter.fromRow(row, prefix + "_system_user_id", Long.class));
         return entity;
     }
 }

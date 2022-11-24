@@ -21,8 +21,12 @@ import { IUser } from 'app/shared/model/user.model';
 export interface IAppUser {
   id?: number;
   designation?: string;
-  systemUser?: IUser;
+  identifier?: string;
+  isCorporateAccount?: boolean | null;
   organization?: IAppUser | null;
+  systemUser?: IUser;
 }
 
-export const defaultValue: Readonly<IAppUser> = {};
+export const defaultValue: Readonly<IAppUser> = {
+  isCorporateAccount: false,
+};

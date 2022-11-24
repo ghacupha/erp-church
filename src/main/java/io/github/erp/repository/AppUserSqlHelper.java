@@ -30,9 +30,11 @@ public class AppUserSqlHelper {
         List<Expression> columns = new ArrayList<>();
         columns.add(Column.aliased("id", table, columnPrefix + "_id"));
         columns.add(Column.aliased("designation", table, columnPrefix + "_designation"));
+        columns.add(Column.aliased("identifier", table, columnPrefix + "_identifier"));
+        columns.add(Column.aliased("is_corporate_account", table, columnPrefix + "_is_corporate_account"));
 
-        columns.add(Column.aliased("system_user_id", table, columnPrefix + "_system_user_id"));
         columns.add(Column.aliased("organization_id", table, columnPrefix + "_organization_id"));
+        columns.add(Column.aliased("system_user_id", table, columnPrefix + "_system_user_id"));
         return columns;
     }
 }

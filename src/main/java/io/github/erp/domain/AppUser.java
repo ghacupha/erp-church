@@ -20,6 +20,7 @@ package io.github.erp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.UUID;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -44,18 +45,25 @@ public class AppUser implements Serializable {
     @Column("designation")
     private String designation;
 
+    @NotNull(message = "must not be null")
+    @Column("identifier")
+    private UUID identifier;
+
+    @Column("is_corporate_account")
+    private Boolean isCorporateAccount;
+
+    @Transient
+    @JsonIgnoreProperties(value = { "organization", "systemUser" }, allowSetters = true)
+    private AppUser organization;
+
     @Transient
     private User systemUser;
 
-    @Transient
-    @JsonIgnoreProperties(value = { "systemUser", "organization" }, allowSetters = true)
-    private AppUser organization;
+    @Column("organization_id")
+    private Long organizationId;
 
     @Column("system_user_id")
     private Long systemUserId;
-
-    @Column("organization_id")
-    private Long organizationId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -85,18 +93,30 @@ public class AppUser implements Serializable {
         this.designation = designation;
     }
 
-    public User getSystemUser() {
-        return this.systemUser;
+    public UUID getIdentifier() {
+        return this.identifier;
     }
 
-    public void setSystemUser(User user) {
-        this.systemUser = user;
-        this.systemUserId = user != null ? user.getId() : null;
-    }
-
-    public AppUser systemUser(User user) {
-        this.setSystemUser(user);
+    public AppUser identifier(UUID identifier) {
+        this.setIdentifier(identifier);
         return this;
+    }
+
+    public void setIdentifier(UUID identifier) {
+        this.identifier = identifier;
+    }
+
+    public Boolean getIsCorporateAccount() {
+        return this.isCorporateAccount;
+    }
+
+    public AppUser isCorporateAccount(Boolean isCorporateAccount) {
+        this.setIsCorporateAccount(isCorporateAccount);
+        return this;
+    }
+
+    public void setIsCorporateAccount(Boolean isCorporateAccount) {
+        this.isCorporateAccount = isCorporateAccount;
     }
 
     public AppUser getOrganization() {
@@ -113,12 +133,18 @@ public class AppUser implements Serializable {
         return this;
     }
 
-    public Long getSystemUserId() {
-        return this.systemUserId;
+    public User getSystemUser() {
+        return this.systemUser;
     }
 
-    public void setSystemUserId(Long user) {
-        this.systemUserId = user;
+    public void setSystemUser(User user) {
+        this.systemUser = user;
+        this.systemUserId = user != null ? user.getId() : null;
+    }
+
+    public AppUser systemUser(User user) {
+        this.setSystemUser(user);
+        return this;
     }
 
     public Long getOrganizationId() {
@@ -127,6 +153,14 @@ public class AppUser implements Serializable {
 
     public void setOrganizationId(Long appUser) {
         this.organizationId = appUser;
+    }
+
+    public Long getSystemUserId() {
+        return this.systemUserId;
+    }
+
+    public void setSystemUserId(Long user) {
+        this.systemUserId = user;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -154,6 +188,8 @@ public class AppUser implements Serializable {
         return "AppUser{" +
             "id=" + getId() +
             ", designation='" + getDesignation() + "'" +
+            ", identifier='" + getIdentifier() + "'" +
+            ", isCorporateAccount='" + getIsCorporateAccount() + "'" +
             "}";
     }
 }

@@ -36,6 +36,7 @@ import io.github.erp.service.mapper.AppUserMapper;
 import java.time.Duration;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.collections4.IterableUtils;
@@ -68,6 +69,12 @@ class AppUserResourceIT {
 
     private static final String DEFAULT_DESIGNATION = "AAAAAAAAAA";
     private static final String UPDATED_DESIGNATION = "BBBBBBBBBB";
+
+    private static final UUID DEFAULT_IDENTIFIER = UUID.randomUUID();
+    private static final UUID UPDATED_IDENTIFIER = UUID.randomUUID();
+
+    private static final Boolean DEFAULT_IS_CORPORATE_ACCOUNT = false;
+    private static final Boolean UPDATED_IS_CORPORATE_ACCOUNT = true;
 
     private static final String ENTITY_API_URL = "/api/app-users";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -106,7 +113,10 @@ class AppUserResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static AppUser createEntity(EntityManager em) {
-        AppUser appUser = new AppUser().designation(DEFAULT_DESIGNATION);
+        AppUser appUser = new AppUser()
+            .designation(DEFAULT_DESIGNATION)
+            .identifier(DEFAULT_IDENTIFIER)
+            .isCorporateAccount(DEFAULT_IS_CORPORATE_ACCOUNT);
         // Add required entity
         User user = em.insert(UserResourceIT.createEntity(em)).block();
         appUser.setSystemUser(user);
@@ -120,7 +130,10 @@ class AppUserResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static AppUser createUpdatedEntity(EntityManager em) {
-        AppUser appUser = new AppUser().designation(UPDATED_DESIGNATION);
+        AppUser appUser = new AppUser()
+            .designation(UPDATED_DESIGNATION)
+            .identifier(UPDATED_IDENTIFIER)
+            .isCorporateAccount(UPDATED_IS_CORPORATE_ACCOUNT);
         // Add required entity
         User user = em.insert(UserResourceIT.createEntity(em)).block();
         appUser.setSystemUser(user);
@@ -179,6 +192,8 @@ class AppUserResourceIT {
             });
         AppUser testAppUser = appUserList.get(appUserList.size() - 1);
         assertThat(testAppUser.getDesignation()).isEqualTo(DEFAULT_DESIGNATION);
+        assertThat(testAppUser.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
+        assertThat(testAppUser.getIsCorporateAccount()).isEqualTo(DEFAULT_IS_CORPORATE_ACCOUNT);
     }
 
     @Test
@@ -233,6 +248,31 @@ class AppUserResourceIT {
     }
 
     @Test
+    void checkIdentifierIsRequired() throws Exception {
+        int databaseSizeBeforeTest = appUserRepository.findAll().collectList().block().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(appUserSearchRepository.findAll().collectList().block());
+        // set the field null
+        appUser.setIdentifier(null);
+
+        // Create the AppUser, which fails.
+        AppUserDTO appUserDTO = appUserMapper.toDto(appUser);
+
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(appUserDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+
+        List<AppUser> appUserList = appUserRepository.findAll().collectList().block();
+        assertThat(appUserList).hasSize(databaseSizeBeforeTest);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(appUserSearchRepository.findAll().collectList().block());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
+    }
+
+    @Test
     void getAllAppUsers() {
         // Initialize the database
         appUserRepository.save(appUser).block();
@@ -251,7 +291,11 @@ class AppUserResourceIT {
             .jsonPath("$.[*].id")
             .value(hasItem(appUser.getId().intValue()))
             .jsonPath("$.[*].designation")
-            .value(hasItem(DEFAULT_DESIGNATION));
+            .value(hasItem(DEFAULT_DESIGNATION))
+            .jsonPath("$.[*].identifier")
+            .value(hasItem(DEFAULT_IDENTIFIER.toString()))
+            .jsonPath("$.[*].isCorporateAccount")
+            .value(hasItem(DEFAULT_IS_CORPORATE_ACCOUNT.booleanValue()));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -290,7 +334,11 @@ class AppUserResourceIT {
             .jsonPath("$.id")
             .value(is(appUser.getId().intValue()))
             .jsonPath("$.designation")
-            .value(is(DEFAULT_DESIGNATION));
+            .value(is(DEFAULT_DESIGNATION))
+            .jsonPath("$.identifier")
+            .value(is(DEFAULT_IDENTIFIER.toString()))
+            .jsonPath("$.isCorporateAccount")
+            .value(is(DEFAULT_IS_CORPORATE_ACCOUNT.booleanValue()));
     }
 
     @Test
@@ -316,7 +364,7 @@ class AppUserResourceIT {
 
         // Update the appUser
         AppUser updatedAppUser = appUserRepository.findById(appUser.getId()).block();
-        updatedAppUser.designation(UPDATED_DESIGNATION);
+        updatedAppUser.designation(UPDATED_DESIGNATION).identifier(UPDATED_IDENTIFIER).isCorporateAccount(UPDATED_IS_CORPORATE_ACCOUNT);
         AppUserDTO appUserDTO = appUserMapper.toDto(updatedAppUser);
 
         webTestClient
@@ -333,6 +381,8 @@ class AppUserResourceIT {
         assertThat(appUserList).hasSize(databaseSizeBeforeUpdate);
         AppUser testAppUser = appUserList.get(appUserList.size() - 1);
         assertThat(testAppUser.getDesignation()).isEqualTo(UPDATED_DESIGNATION);
+        assertThat(testAppUser.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testAppUser.getIsCorporateAccount()).isEqualTo(UPDATED_IS_CORPORATE_ACCOUNT);
         await()
             .atMost(5, TimeUnit.SECONDS)
             .untilAsserted(() -> {
@@ -341,6 +391,8 @@ class AppUserResourceIT {
                 List<AppUser> appUserSearchList = IterableUtils.toList(appUserSearchRepository.findAll().collectList().block());
                 AppUser testAppUserSearch = appUserSearchList.get(searchDatabaseSizeAfter - 1);
                 assertThat(testAppUserSearch.getDesignation()).isEqualTo(UPDATED_DESIGNATION);
+                assertThat(testAppUserSearch.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+                assertThat(testAppUserSearch.getIsCorporateAccount()).isEqualTo(UPDATED_IS_CORPORATE_ACCOUNT);
             });
     }
 
@@ -433,7 +485,7 @@ class AppUserResourceIT {
         AppUser partialUpdatedAppUser = new AppUser();
         partialUpdatedAppUser.setId(appUser.getId());
 
-        partialUpdatedAppUser.designation(UPDATED_DESIGNATION);
+        partialUpdatedAppUser.designation(UPDATED_DESIGNATION).identifier(UPDATED_IDENTIFIER);
 
         webTestClient
             .patch()
@@ -449,6 +501,8 @@ class AppUserResourceIT {
         assertThat(appUserList).hasSize(databaseSizeBeforeUpdate);
         AppUser testAppUser = appUserList.get(appUserList.size() - 1);
         assertThat(testAppUser.getDesignation()).isEqualTo(UPDATED_DESIGNATION);
+        assertThat(testAppUser.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testAppUser.getIsCorporateAccount()).isEqualTo(DEFAULT_IS_CORPORATE_ACCOUNT);
     }
 
     @Test
@@ -462,7 +516,10 @@ class AppUserResourceIT {
         AppUser partialUpdatedAppUser = new AppUser();
         partialUpdatedAppUser.setId(appUser.getId());
 
-        partialUpdatedAppUser.designation(UPDATED_DESIGNATION);
+        partialUpdatedAppUser
+            .designation(UPDATED_DESIGNATION)
+            .identifier(UPDATED_IDENTIFIER)
+            .isCorporateAccount(UPDATED_IS_CORPORATE_ACCOUNT);
 
         webTestClient
             .patch()
@@ -478,6 +535,8 @@ class AppUserResourceIT {
         assertThat(appUserList).hasSize(databaseSizeBeforeUpdate);
         AppUser testAppUser = appUserList.get(appUserList.size() - 1);
         assertThat(testAppUser.getDesignation()).isEqualTo(UPDATED_DESIGNATION);
+        assertThat(testAppUser.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testAppUser.getIsCorporateAccount()).isEqualTo(UPDATED_IS_CORPORATE_ACCOUNT);
     }
 
     @Test
@@ -604,6 +663,10 @@ class AppUserResourceIT {
             .jsonPath("$.[*].id")
             .value(hasItem(appUser.getId().intValue()))
             .jsonPath("$.[*].designation")
-            .value(hasItem(DEFAULT_DESIGNATION));
+            .value(hasItem(DEFAULT_DESIGNATION))
+            .jsonPath("$.[*].identifier")
+            .value(hasItem(DEFAULT_IDENTIFIER.toString()))
+            .jsonPath("$.[*].isCorporateAccount")
+            .value(hasItem(DEFAULT_IS_CORPORATE_ACCOUNT.booleanValue()));
     }
 }
